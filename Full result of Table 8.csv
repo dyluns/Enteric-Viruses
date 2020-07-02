@@ -1,0 +1,136 @@
+Types,Cases
+Uninfected,267
+"Alphapapillomavirus, Alphatorquevirus, Betatorquevirus, Enterovirus, Gammatorquevirus",1
+Alphatorquevirus,15
+"Alphatorquevirus, Betapolyomavirus, Betatorquevirus, Enterovirus",1
+"Alphatorquevirus, Betatorquevirus",8
+"Alphatorquevirus, Betatorquevirus, Gammatorquevirus",2
+"Alphatorquevirus, Betatorquevirus, Gammatorquevirus, Norovirus, Sapovirus",1
+"Alphatorquevirus, Betatorquevirus, Gammatorquevirus, Rotavirus, Unclassified.virus",1
+"Alphatorquevirus, Betatorquevirus, Kobuvirus",1
+"Alphatorquevirus, Betatorquevirus, Mamastrovirus",1
+"Alphatorquevirus, Betatorquevirus, Mamastrovirus, Norovirus",1
+"Alphatorquevirus, Betatorquevirus, Mastadenovirus",1
+"Alphatorquevirus, Betatorquevirus, Mastadenovirus, Norovirus",1
+"Alphatorquevirus, Betatorquevirus, Norovirus, Parechovirus",1
+"Alphatorquevirus, Betatorquevirus, Parechovirus",1
+"Alphatorquevirus, Betatorquevirus, Picobirnavirus",1
+"Alphatorquevirus, Betatorquevirus, Picobirnavirus, Rotavirus, Unclassified.virus",1
+"Alphatorquevirus, Betatorquevirus, Rotavirus",1
+"Alphatorquevirus, Betatorquevirus, Sapovirus",1
+"Alphatorquevirus, Betatorquevirus, Unclassified.virus",2
+"Alphatorquevirus, Cosavirus, Gammatorquevirus, Norovirus",1
+"Alphatorquevirus, Enterovirus",3
+"Alphatorquevirus, Enterovirus, Norovirus",1
+"Alphatorquevirus, Enterovirus, Parechovirus",1
+"Alphatorquevirus, Gammatorquevirus",3
+"Alphatorquevirus, Gammatorquevirus, Norovirus",1
+"Alphatorquevirus, Gammatorquevirus, Sapovirus",1
+"Alphatorquevirus, Gammatorquevirus, Unclassified.virus",1
+"Alphatorquevirus, Mamastrovirus",2
+"Alphatorquevirus, Mastadenovirus",2
+"Alphatorquevirus, Mastadenovirus, Parechovirus",1
+"Alphatorquevirus, Mastadenovirus, Unclassified.virus",2
+"Alphatorquevirus, Morbillivirus",1
+"Alphatorquevirus, Norovirus",2
+"Alphatorquevirus, Norovirus, Parechovirus, Sapovirus",1
+"Alphatorquevirus, Norovirus, Salivirus",1
+"Alphatorquevirus, Rotavirus",1
+"Alphatorquevirus, Rotavirus, Unclassified.virus",1
+"Alphatorquevirus, Sapovirus",2
+"Alphatorquevirus, Unclassified.virus",2
+Betapolyomavirus,2
+"Betapolyomavirus, Picobirnavirus",1
+"Betapolyomavirus, Rotavirus, Rubulavirus",1
+Betatorquevirus,4
+"Betatorquevirus, Cardiovirus",1
+"Betatorquevirus, Cytomegalovirus, Enterovirus, Norovirus",1
+"Betatorquevirus, Enterovirus",3
+"Betatorquevirus, Enterovirus, Norovirus",1
+"Betatorquevirus, Enterovirus, Norovirus, Parechovirus",1
+"Betatorquevirus, Enterovirus, Rotavirus",1
+"Betatorquevirus, Gammatorquevirus",1
+"Betatorquevirus, Kobuvirus",1
+"Betatorquevirus, Norovirus",3
+"Betatorquevirus, Parechovirus",2
+"Betatorquevirus, Picobirnavirus",1
+"Betatorquevirus, Rotavirus",3
+"Betatorquevirus, Rotavirus, Salivirus",1
+"Betatorquevirus, Rotavirus, Sapovirus",1
+"Betatorquevirus, Unclassified.virus",1
+Bocaparvovirus,2
+"Bocaparvovirus, Cardiovirus, Enterovirus, Norovirus",1
+"Bocaparvovirus, Enterovirus",1
+"Bocaparvovirus, Gemykibivirus, Rotavirus",1
+"Bocaparvovirus, Mastadenovirus, Norovirus",1
+"Bocaparvovirus, Mastadenovirus, Rotavirus, Sapovirus",1
+"Bocaparvovirus, Parechovirus, Salivirus",1
+"Bocaparvovirus, Rotavirus",1
+Cardiovirus,1
+"Cardiovirus, Rotavirus, Salivirus",1
+Cosavirus,1
+"Cosavirus, Enterovirus",1
+"Cosavirus, Rotavirus, Salivirus, Sapovirus",1
+"Cosavirus, Sapovirus",1
+"Cytomegalovirus, Rotavirus, Rubulavirus",1
+"Cytomegalovirus, Rotavirus, Unclassified.virus",1
+Enterovirus,13
+"Enterovirus, Gammatorquevirus",1
+"Enterovirus, Gammatorquevirus, Norovirus, Parechovirus, Sapovirus",1
+"Enterovirus, Gammatorquevirus, Parechovirus",1
+"Enterovirus, Kobuvirus",1
+"Enterovirus, Mastadenovirus",3
+"Enterovirus, Mastadenovirus, Picobirnavirus",1
+"Enterovirus, Norovirus",5
+"Enterovirus, Norovirus, Parechovirus",1
+"Enterovirus, Norovirus, Sapovirus",3
+"Enterovirus, Picobirnavirus",2
+"Enterovirus, Rotavirus",1
+"Enterovirus, Sapovirus",2
+Gammatorquevirus,2
+"Gammatorquevirus, Rotavirus",1
+"Gemycircularvirus, Picobirnavirus, Unclassified.virus",1
+Gemykibivirus,1
+Gemykrogvirus,2
+"Husavirus, Mastadenovirus",1
+Kobuvirus,1
+"Kobuvirus, Parechovirus, Rotavirus",1
+Mamastrovirus,8
+"Mamastrovirus, Picobirnavirus",1
+"Mamastrovirus, Picobirnavirus, Unclassified.virus",1
+"Mamastrovirus, Rotavirus",7
+"Mamastrovirus, Sapovirus",1
+Mastadenovirus,24
+"Mastadenovirus, Norovirus",4
+"Mastadenovirus, Norovirus, Rotavirus",1
+"Mastadenovirus, Parechovirus",1
+"Mastadenovirus, Parechovirus, Sapovirus",1
+"Mastadenovirus, Rotavirus",2
+"Mastadenovirus, Rotavirus, Sapovirus",1
+"Mastadenovirus, Sapovirus",2
+"Mastadenovirus, Unclassified.virus",1
+"Morbillivirus, Norovirus, Sapovirus",1
+Norovirus,30
+"Norovirus, Parechovirus",3
+"Norovirus, Parechovirus, Sapovirus",2
+"Norovirus, Picobirnavirus",3
+"Norovirus, Picobirnavirus, Sapovirus",2
+"Norovirus, Rotavirus",3
+"Norovirus, Sapovirus",10
+"Norovirus, Unclassified.virus",1
+Parechovirus,5
+"Parechovirus, Rotavirus",7
+"Parechovirus, Sapovirus",2
+Picobirnavirus,15
+"Picobirnavirus, Sapovirus",2
+"Picobirnavirus, Sapovirus, Unclassified.virus",1
+"Picobirnavirus, Unclassified.virus",4
+Porprismacovirus,1
+Protoparvovirus,1
+Rotavirus,102
+"Rotavirus, Salivirus",4
+"Rotavirus, Sapovirus",1
+"Rotavirus, Unclassified.virus",1
+Salivirus,1
+Sapovirus,15
+Unclassified.virus,4

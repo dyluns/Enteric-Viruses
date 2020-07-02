@@ -1,0 +1,355 @@
+---
+title: "main"
+output: html_document
+---
+
+Code for SwDS dissertation 1 (Part 2)
+Part 1 of the code can be found in 'Python_code.ipynb'
+
+Yilun Dong (s1994256), July/2020
+
+```{r}
+library(xlsx)
+library(tidyverse)
+library(nnet)
+library(MASS)
+library(cluster)
+library(StatMatch)
+library(Rtsne)
+# library(stargazer)
+# library(xtable)
+```
+
+```{r}
+envdf <- read.xlsx('Data for enteric virus MSc.xlsx', header = TRUE, sheetIndex = 1)
+```
+
+Code for Section 1
+
+Summary statistics
+
+```{r}
+envdf_summary <- envdf[c('Age','Gender','is_coinf')]
+envdf_summary$Gender <- as.factor(envdf_summary$Gender)
+envdf_summary$factorAge <- as.factor(envdf_summary$Age)
+
+summary(envdf_summary)
+```
+
+Time period
+
+```{r}
+envdf_time <- envdf[c('Date.of.hospital.entry', 'DateOnset')]
+envdf_time['EntryMonth'] <- ifelse(envdf_time$Date.of.hospital.entry < envdf_time$DateOnset,
+                                   format(envdf_time$Date.of.hospital.entry,'%Y-%m'),
+                                   format(envdf_time$DateOnset,'%Y-%m'))
+
+envdf_time
+```
+
+Code for Section 3 (regression models)
+
+```{r}
+envdf_multinomial <- envdf[c("is_coinf", "Age", "Gender", "CentrallyCity", "ProvincialCity", "Tap", "Well", "Rain", "River", "Pond", "Bottled", "OtherWS", "ContactDiar", "KeepAnimal", "KillingAnimal", "EatCookRawMeat")]
+
+# Discard missing values. Note that the only column with missing values here is `ContactDiar`.
+
+envdf_multinomial <- envdf_multinomial[envdf_multinomial$Gender != 9,]
+envdf_multinomial <- envdf_multinomial[envdf_multinomial$ContactDiar != 9,]
+envdf_multinomial <- envdf_multinomial[envdf_multinomial$KeepAnimal != 9,]
+envdf_multinomial <- envdf_multinomial[envdf_multinomial$KillingAnimal != 9,]
+envdf_multinomial <- envdf_multinomial[envdf_multinomial$EatCookRawMeat != 9,]
+
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Age), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$CentrallyCity), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Tap), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Well), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Rain), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$River), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Pond), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$Bottled), ]
+envdf_multinomial <- envdf_multinomial[!is.na(envdf_multinomial$OtherWS), ]
+
+# Covert to 'TRUE' or 'FALSE'
+
+envdf_multinomial$Gender <- envdf_multinomial$Gender == 1
+envdf_multinomial$ContactDiar <- envdf_multinomial$ContactDiar == 1
+envdf_multinomial$KeepAnimal <- envdf_multinomial$KeepAnimal == 1
+envdf_multinomial$KillingAnimal <- envdf_multinomial$KillingAnimal == 1
+envdf_multinomial$EatCookRawMeat <- envdf_multinomial$EatCookRawMeat == 1
+
+# New variables
+
+envdf_multinomial$Unclean_water <- (envdf_multinomial$Tap==TRUE)|(envdf_multinomial$Well==TRUE)|(envdf_multinomial$Rain==TRUE)|(envdf_multinomial$River==TRUE)|(envdf_multinomial$Pond==TRUE)
+envdf_multinomial$Clean_water_only <- (envdf_multinomial$Bottled==TRUE) & (envdf_multinomial$Unclean_water==FALSE)
+envdf_multinomial$Exposure <- (envdf_multinomial$ContactDiar==TRUE)|(envdf_multinomial$KeepAnimal==TRUE)|(envdf_multinomial$KillingAnimal==TRUE)|(envdf_multinomial$EatCookRawMeat==TRUE)
+
+# Set reference level for multinomial logit regression
+
+envdf_multinomial$is_coinf <- relevel(envdf_multinomial$is_coinf, ref="NA")
+
+# modified data frame
+
+envdf_multinomial
+```
+
+Multinomial logit regression
+
+```{r}
+m1 <- multinom(formula = is_coinf ~ Age + Gender + CentrallyCity + Clean_water_only + Exposure, data = envdf_multinomial)
+
+m1_coef <- exp(coef(m1))
+
+# Please note tha the warning message 'length of NULL cannot be changed' from `stargazer` does not influence the content in the table produced.
+# htm1 <- capture.output(stargazer(m1, type="html", coef=list(m1_coef), p.auto=FALSE, out="m1_coef.htm"))
+# tex1 <- capture.output(stargazer(m1, type="latex", coef=list(m1_coef), p.auto=FALSE, out="m1_coef.tex"))
+```
+
+Ordinal logit regression
+
+```{r}
+m2 <- polr(formula = is_coinf ~ Age + Gender + CentrallyCity + Clean_water_only + Exposure, data = envdf_multinomial, Hess = TRUE)
+
+m2_coef <- exp(coef(m2))
+
+# htm2 <- capture.output(stargazer(m2, type="html", coef=list(m2_coef), p.auto=FALSE, out="m2_coef.htm"))
+# tex2 <- capture.output(stargazer(m2, type="latex", coef=list(m2_coef), p.auto=FALSE, out="m2_coef.tex"))
+```
+
+```{r}
+# exponentialized values of intercepts of `m2` and their p-values
+
+coef_table <- coef(summary(m2))
+p <- pnorm(abs(coef_table[, "t value"]), lower.tail = FALSE) * 2
+coef_table <- cbind(coef_table, "p value" = p)
+print(coef_table)
+
+print(exp(m2$zeta))
+```
+
+Logit regression
+
+```{r}
+envdf_binomial <- envdf[envdf$ContactDiar != 9,]
+envdf_binomial <- cbind(envdf_multinomial, envdf_binomial['Rotavirus'], envdf_binomial['Norovirus'], envdf_binomial['Sapovirus'])
+envdf_binomial$Rotavirus <- as.factor(envdf_binomial$Rotavirus)
+envdf_binomial$Norovirus <- as.factor(envdf_binomial$Norovirus)
+envdf_binomial$Sapovirus <- as.factor(envdf_binomial$Sapovirus)
+
+# Function `glm()` takes the second level as 'success'. Therefore, '1' and '2' should be converted to 'TRUE' and 'FALSE'.
+# Can refer to `?binomial` for more detail.
+envdf_binomial$Rotavirus <- envdf_binomial$Rotavirus == 1
+envdf_binomial$Norovirus <- envdf_binomial$Norovirus == 1
+envdf_binomial$Sapovirus <- envdf_binomial$Sapovirus == 1
+
+envdf_binomial <- envdf_binomial[(envdf_binomial$CentrallyCity == "Dong Thap"), ]
+
+envdf_binomial
+```
+
+```{r}
+# full model
+
+m3 <- glm(formula = Rotavirus ~ Age + Gender + ProvincialCity + Tap + Well + Rain + River + Pond + Bottled + ContactDiar + KeepAnimal + KillingAnimal + EatCookRawMeat, data = envdf_binomial, family = binomial)
+
+m3_coef <- exp(coef(m3))
+
+# htm3 <- capture.output(stargazer(m3, type="html", coef=list(m3_coef), p.auto=FALSE, out="m3_coef.htm"))
+# tex3 <- capture.output(stargazer(m3, type="latex", coef=list(m3_coef), p.auto=FALSE, out="m3_coef.tex"))
+```
+
+```{r}
+# reduced model
+
+m31 <- glm(formula = Rotavirus ~ Age + Bottled, data = envdf_binomial, family = binomial)
+summary(m31)
+
+m31_coef <- exp(coef(m31))
+
+# htm31 <- capture.output(stargazer(m31, type="html", coef=list(m31_coef), p.auto=FALSE, out="m31_coef.htm"))
+# tex31 <- capture.output(stargazer(m31, type="latex", coef=list(m31_coef), p.auto=FALSE, out="m31_coef.tex"))
+```
+
+```{r}
+# chi-squared test
+
+anova(m31, m3, test="Chisq") 
+```
+
+Code for Section 4 
+
+Common coinfections
+
+```{r}
+# Count numbers for each case (each type of infection)
+envdf_coinf <- envdf %>% 
+  group_by_at(56:87) %>%
+  summarise(Cases = n())
+envdf_coinf <- envdf_coinf[order(-envdf_coinf$Cases), ]
+
+# Calculate the number of infections for each case
+envdf_coinf[, 'number_coinf'] <- numeric(nrow(envdf_coinf))
+for(i in 1:nrow(envdf_coinf)){
+  number_of_infection = 0
+  for(j in 1:(ncol(envdf_coinf)-2)){
+    if(envdf_coinf[i,j] == 1){
+      number_of_infection = number_of_infection + 1
+    }
+  }
+  envdf_coinf$number_coinf[i] <- number_of_infection
+}
+envdf_coinf <- envdf_coinf[,c(ncol(envdf_coinf),1:(ncol(envdf_coinf)-1))]
+envdf_coinf <- envdf_coinf[,c(ncol(envdf_coinf),1:(ncol(envdf_coinf)-1))]
+
+# Find the combination of viruses for each case
+envdf_coinf[, 'Types'] <- NA
+for(i in 1:nrow(envdf_coinf)){
+  name_str <- ''
+  for(j in 3:(ncol(envdf_coinf)-1)){
+    if(envdf_coinf[i,j] == 1){
+      name_str <- paste(name_str, colnames(envdf_coinf)[j], sep=", ")
+    }
+  }
+  envdf_coinf$Types[i] <- substring(name_str, 3)
+}
+
+# result
+envdf_coinf <- envdf_coinf[,c(ncol(envdf_coinf),1:(ncol(envdf_coinf)-1))]
+envdf_coinf <- envdf_coinf[order(envdf_coinf$Types), ]
+envdf_coinf$Types[1] <- 'Uninfected'
+
+envdf_coinf
+```
+
+Cluster analysis
+
+```{r}
+envdf_ca <- envdf[,c(12, 20, 18, 19, 21:28, 56:87)]
+
+# Creat a new column `Type` and move it to front
+envdf_ca$Type <- NA
+envdf_ca <- envdf_ca[,c(ncol(envdf_ca),1:(ncol(envdf_ca)-1))]
+
+# values for the new column
+for(i in 1:nrow(envdf_ca)){
+  name_str <- ''
+  for(j in 13:45){
+    if(envdf_ca[i,j] == 1){
+      name_str <- paste(name_str, colnames(envdf_ca)[j], sep=", ")
+    }
+    if(nchar(name_str) <= 3){
+      envdf_ca$Type[i] <- 'Uninfected'
+    }
+    else{
+      envdf_ca$Type[i] <- substring(name_str, 3)
+    }
+  }
+}
+
+# result
+envdf_ca
+```
+
+```{r}
+# Tidy data
+
+envdf_ca_complete <- envdf_ca[, 1:13]
+
+for(i in 8:13){
+ envdf_ca_complete[, i] <- as.character(envdf_ca_complete[, i])  
+}
+envdf_ca_complete[, 3] <- as.character(envdf_ca_complete[, 3])  
+
+for(i in 4:7){
+  envdf_ca_complete[, i] <- ifelse(envdf_ca_complete[, i] == 9, NA, envdf_ca_complete[, i])
+}
+
+for(i in 8:13){
+ envdf_ca_complete[, i] <- ifelse(envdf_ca_complete[, i] == 'NA', NA, envdf_ca_complete[, i])
+}
+envdf_ca_complete[, 2] <- ifelse(envdf_ca_complete[, 2] == 'NA', NA, envdf_ca_complete[, 2])
+envdf_ca_complete[, 3] <- ifelse(envdf_ca_complete[, 3] == 'NA', NA, envdf_ca_complete[, 3])
+
+# Merge numerical columns
+envdf_ca_mean <- enframe(tapply(envdf_ca_complete$Length.of.stay, envdf_ca_complete$Type, mean))
+for(i in 3:13){
+  newcol <- enframe(tapply(as.numeric(envdf_ca_complete[, i]), envdf_ca_complete$Type, mean, na.rm = TRUE))[2]
+  envdf_ca_mean <- cbind(envdf_ca_mean, newcol)
+}
+
+# Merge categorical columns
+colnames(envdf_ca_mean) <- colnames(envdf_ca[1:13])
+round_down <- function(x) ceiling(x - 0.5)
+envdf_ca_mean[, 4:7] <- round_down(envdf_ca_mean[, 4:7])
+envdf_ca_mean$BloodStool <- as.factor(envdf_ca_mean$BloodStool)
+envdf_ca_mean$MucoidStool <- as.factor(envdf_ca_mean$MucoidStool)
+envdf_ca_mean$AbdominalPain <- as.factor(envdf_ca_mean$AbdominalPain)
+envdf_ca_mean$ThreeDaysFever <- as.factor(envdf_ca_mean$ThreeDaysFever)
+
+# result
+envdf_ca_mean
+```
+
+```{r}
+# Gower distance matrix
+dist_mat <- gower.dist(envdf_ca_mean[, -1])
+
+# average silhouette width (calculation)
+silhouette <- c(NA)
+
+for(i in 2:12){
+  pam_result <- pam(dist_mat, diss = TRUE, k = i)
+  silhouette[i] <- pam_result$silinfo$avg.width
+}
+
+#  average silhouette width (plot)
+plot(1:12, silhouette,
+     xlab = "Number of clusters",
+     ylab = "ASW")
+lines(1:12, silhouette)
+abline(v=7, lty=2, col = 'red')
+```
+
+```{r}
+# evaluation
+set.seed(1)
+pam_result <- pam(dist_mat, diss = TRUE, k = 7)
+
+tsne_data <- Rtsne(dist_mat, is_distance = TRUE)
+tsne_data <- tsne_data$Y %>%
+  data.frame() %>%
+  setNames(c("X", "Y")) %>%
+  mutate(cluster = factor(pam_result$clustering),
+         name = envdf_ca_mean$Type)
+
+ggplot(aes(x = X, y = Y), data = tsne_data) +
+  geom_point(aes(color = cluster)) +
+  scale_color_discrete(name = "Cluster") +
+  theme(axis.text = element_text(size=12),
+        axis.title = element_text(size=15),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15)
+        )
+```
+
+```{r}
+# result of the cluster analysis
+ca_result <- envdf_ca_mean['Type']
+ca_result$Cluster <- pam_result$clustering
+ca_result <- ca_result[order(ca_result$Cluster), ]
+
+ca_result
+```
+
+```{r}
+# centres of the clusters
+ca_centres <- envdf_ca_mean[pam_result$medoids, ]
+ca_centres <- setNames(data.frame(t(ca_centres[,-1])), ca_centres[,1])
+
+# print(xtable(ca_centres, type = "latex"), file = "ca_centres.tex")
+```
+
+
+
+
+
